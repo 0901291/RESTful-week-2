@@ -1,0 +1,23 @@
+.note {
+    background-color: #eee;
+}
+
+.note.collapsed {
+    background-color: #fff;
+}
+
+.note:hover {
+    cursor: pointer;
+}
+
+.note-intro {
+    color: #999D9E;
+    font-style: italic;
+    font-size: 12px;
+    margin-left: 10px;
+}
+
+.note-content {
+    border-radius: 0 !important;
+    border-bottom: none;
+}
