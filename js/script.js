@@ -6,47 +6,46 @@ function initApp() {
     $(".container").on("click", "#note-form .panel-heading", function() {
         $("#note-form .panel-body").toggleClass("closed");
     });
-    $(".container").on("click", "#note-form #save-note", initSaveNote);
-    $(".container").on("click", "#note-form #cancel-note", closeNoteForm);
-    reqNote("getAllNotes", "GET", "", function (output) {
-        console.log(output);
-        printNotes(output, $(".container"));
+    $(".container").on("click", "#save-note", initSaveNote);
+    $(".container").on("click", "#cancel-note", closeNoteForm);
+    requestNote("getNote", "GET", "", function (output) {
+        printNotes(output);
     });
 }
 
-function printNotes(data, container) {
+function printNotes(data) {
     var notes = "<ul id='notes' class='panel list-group'>";
     $.each(data, function(k, v) {
         notes += formatNote(v);
     });
     notes += "</ul>";
-    container.append(notes);
+    $(".container").append(notes);
 }
 
 function formatNote(note) {
     return "<li href='#' data-id='" + note.id + "' data-toggle='collapse' data-target='#note-" + note.id + "' data-parent='.container' class='note collapsed list-group-item'>" +
-        "<span class='note-title'>" + note.title + "</span>" +
-        "<span class='note-intro'>" + truncateText(note.body, 50) + "</span>" +
-    "</li>" +
-    "<div class='sublinks collapse' id='note-" + note.id + "'>" +
-        "<div class='note-content list-group-item'>" +
-            "<p>" + note.body + "</p>" +
-            "<button type='button' class='edit-button btn btn-primary'>Edit</button><button type='button' class='delete-button btn btn-danger'>Delete</button>" +
-        "</div>" +
-    "</div>"
+                "<span class='note-title'>" + note.title + "</span>" +
+                "<span class='note-intro'>" + truncateText(note.body, 50) + "</span>" +
+            "</li>" +
+            "<div class='sublinks collapse' id='note-" + note.id + "'>" +
+                "<div class='note-content list-group-item'>" +
+                    "<p>" + note.body + "</p>" +
+                    "<button type='button' class='edit-button btn btn-primary'>Edit</button><button type='button' class='delete-button btn btn-danger'>Delete</button>" +
+                "</div>" +
+            "</div>"
 }
 
 function initEditNote(e) {
     $("#note-form .panel-heading").text("Edit note");
-    var noteId = $(e.currentTarget).parent().parent().attr("id");
-    reqNote("getNote", "GET", noteId.substring(5, noteId.length), fillNoteForm);
+    var id = $(e.currentTarget).parent().parent().attr("id");
+    requestNote("getNote", "GET", id.substring(5, id.length), fillNoteForm);
 }
 
 function fillNoteForm(output) {
-    $("#note-form #note-id").val(output.id);
-    $("#note-form #input-title").val(output.title);
-    $("#note-form #input-body").val(output.body);
-    $("#note-form #input-author").val(output.author);
+    $("#note-id").val(output.id);
+    $("#input-title").val(output.title);
+    $("#input-body").val(output.body);
+    $("#input-author").val(output.author);
     $("body").animate({ scrollTop: 0 });
     $("#note-form .panel-body").removeClass("closed");
 }
@@ -64,15 +63,15 @@ function initSaveNote() {
     var id = $("#note-id").val();
     if (id == "") {
         extendNote({}, "createNote", function (output) {
-            $(".container #notes").append(formatNote(output));
+            $("#notes").append(formatNote(output));
             closeNoteForm();
             showMessage("<strong>Saved!</strong> Your note is successfully saved.");
         });
     } else if ($.isNumeric(id)) {
-        reqNote("getNote", "GET", id, function (output) {
+        requestNote("getNote", "GET", id, function (output) {
             extendNote(output, "updateNote", function (output) {
-                $(".container #notes .note[data-id=" + output.id + "]").addClass("to-remove");
-                $(".container #notes #note-" + output.id).addClass("to-remove").after(formatNote(output));
+                $("#notes .note[data-id=" + output.id + "]").remove();
+                $("#notes #note-" + output.id).addClass("to-remove").after(formatNote(output));
                 $(".to-remove").remove();
             });
             closeNoteForm();
@@ -83,27 +82,26 @@ function initSaveNote() {
 
 function extendNote(note, request, onSuccess) {
     note = $.extend(note, {
-        title: $("#note-form #input-title").val(),
-        body: $("#note-form #input-body").val(),
-        author: $("#note-form #input-author").val(),
+        title: $("#input-title").val(),
+        body: $("#input-body").val(),
+        author: $("#input-author").val(),
         date: formatDate(new Date())
     });
-    reqNote(request, "POST", "", onSuccess, note);
+    requestNote(request, "POST", "", onSuccess, note);
 }
 
 function deleteNote(e) {
     var id = $(e.currentTarget).parent().parent().attr("id");
     id = id.substring(5, id.length);
-    reqNote("deleteNote", "POST", id, function (output) {
-        console.log(output);
-        $(".container #notes .note[data-id=" + id + "]").remove();
-        $(".container #notes #note-" + id).remove();
+    requestNote("deleteNote", "POST", id, function (output) {
+        $("#notes .note[data-id=" + id + "]").remove();
+        $("#notes #note-" + id).remove();
         $("body").animate({ scrollTop: 0 });
         showMessage("<strong>Deleted!</strong> Your note is successfully deleted.");
     });
 }
 
-function reqNote(request, method, id, onSuccess, note) {
+function requestNote(request, method, id, onSuccess, note) {
     $.ajax({
         method: method,
         url: "notes.php",

@@ -17,11 +17,8 @@
     {
         switch ($http["request"])
         {
-            case "getAllNotes":
-                getAllNotes($client, $baseURI);
-                break;
             case "getNote":
-                getNote($client, $baseURI, $http["id"]);
+                getNote($client, $baseURI, (isset($http["id"]) && $http["id"] != "" ? $http["id"] : ""));
                 break;
             case "createNote":
                 createNote($client, $baseURI, $http["note"]);
@@ -36,12 +33,6 @@
                 getAllNotes($client, $baseURI);
                 break;
         }
-    }
-
-    function getAllNotes($client, $url)
-    {
-        $response = $client->get($url);   
-        echo $response->getBody();
     }
 
     function getNote($client, $url, $id)
