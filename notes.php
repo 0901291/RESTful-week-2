@@ -3,11 +3,36 @@
     $baseURI = "http://docent.cmi.hro.nl/bootb/restdemo/notes/";
     $client = new GuzzleHttp\Client();
 
-    if (isset($_GET["request"]))
+    $http;
+    if (isset($_GET["request"])) 
     {
-        switch ($_GET["request"])
+        $http = $_GET;
+    }
+    else if (isset($_POST["request"]))
+    {
+        $http = $_POST;
+    }
+
+    if (isset($http["request"]))
+    {
+        switch ($http["request"])
         {
             case "getAllNotes":
+                getAllNotes($client, $baseURI);
+                break;
+            case "getNote":
+                getNote($client, $baseURI, $http["id"]);
+                break;
+            case "createNote":
+                createNote($client, $baseURI, $http["note"]);
+                break;
+            case "updateNote":
+                updateNote($client, $baseURI, $http["note"]);
+                break;
+            case "deleteNote":
+                deleteNote($client, $baseURI, $http["id"]);
+                break;
+            default:
                 getAllNotes($client, $baseURI);
                 break;
         }
@@ -18,39 +43,31 @@
         $response = $client->get($url);   
         echo $response->getBody();
     }
+
+    function getNote($client, $url, $id)
+    {
+        $response = $client->get($url . $id);
+        echo $response->getBody();
+    }
      
-    // echo $response->getStatusCode();
-    // "200" 
-     
-    // echo $response->getHeader('content-type')[0]; 
-    // 'application/json; charset=utf8’  
-    // geeft een array terug, waarvan ik de eerste gebruik   
-    
-    // [{"id":"1","title":... etc. 
-     
-    // $json = json_decode($response->getBody());  // zet json uit de body om in object 
-     
-    // echo $json[2]->title; 
-    // haal 3e object uit collectie, en toon daarvan element title 
-     
-    // echo "send post as key value";   
-    // $response = $client->post('http://uri', [  ’form_params' => [ 
-    // ]);   
-    // ’key' => ’value',  ’key2' => ’value2’ ] 
-    // echo $response->getStatusCode();  // "201" 
-     
-    // echo "send post as json"; 
-     
-    // $response = $client->post('http://uri', ['json' => [’key' => ’value']]); 
-     
-    // echo $response->getStatusCode(); 
-    // // "201" 
-     
-    // $response = $client->put('http://uri', ['json' => [’key' => ’changedvalue']]); 
-    // // werkt hetzelfde als post 
-     
-    // echo $response->getStatusCode(); 
-    // // "200" 
-     
-    // $response = $client->delete('http://uri');   
-    // echo $response->getStatusCode();  // "204"
+    function createNote($client, $url, $note)
+    {
+        $response = $client->post($url, ["json" => $note]);
+        echo $response->getBody();
+    }
+
+    function updateNote($client, $url, $note)
+    {
+        $response = $client->put($url . $note["id"], ["json" => $note]);
+        echo $response->getBody();
+    }
+
+    function deleteNote($client, $url, $id) 
+    {
+        $response = $client->delete($url . $id);
+        echo "{}";
+    }
+
+
+
+

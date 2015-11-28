@@ -5,18 +5,38 @@
     <title>RESTful week 2 | wensink-ian-0901291</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-aUGj/X2zp5rLCbBxumKTCw2Z50WgIr1vs/PFN4praOTvYXWlVyh2UtNUU0KAUhAX" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/bootstrap-datetimepicker.min.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div class="container">
         <div id="note-form" class="panel panel-default">
-            <div class="panel-heading">New Note</div>
-            <div class="panel-body collapse"></div>
+            <div class="panel-heading">New note</div>
+            <div class="panel-body closed">
+                <form>
+                    <input type="hidden" id="note-id">
+                    <fieldset class="form-group">
+                        <label for="input-title">Title</label>
+                        <input type="text" class="form-control" id="input-title" placeholder="Title">
+                    </fieldset>
+                    <fieldset class="form-group">
+                        <label for="input-body">Body</label>
+                        <textarea class="form-control" id="input-body" rows="3" placeholder="Body"></textarea>
+                    </fieldset>
+                    <fieldset class="form-group">
+                        <label for="input-author">Author</label>
+                        <input type="text" class="form-control" id="input-author" placeholder="Author">
+                    </fieldset>
+                    <button type="button" class="btn btn-primary" id="save-note">Save</button>
+                    <button type="button" class="btn btn-danger" id="cancel-note">Cancel</button>
+                </form>
+            </div>
         </div>
     </div>
     <script src="js/jquery-2.1.3.min.js"></script>
-    <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
+    <script src="js/bootstrap-datetimepicker.min.js"></script>
+     <script type="text/javascript" src="http://tarruda.github.com/bootstrap-datetimepicker/assets/js/bootstrap-datetimepicker.pt-BR.js"></script>
     <script src="js/script.js"></script>
 </body>
 </html>
