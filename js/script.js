@@ -63,10 +63,10 @@ function closeNoteForm() {
 function initSaveNote() {
     var id = $("#note-id").val();
     if (id == "") {
-        extendNote({}, "createNote", function (output) {
-            $("#notes").append(formatNote(output));
+        extendNote({}, "createNote", function (note) {
+            $("#notes").append(formatNote(note));
             closeNoteForm();
-            showMessage("<strong>Saved!</strong> Your note <strong>\"" + truncateText(output.title, 30) + "\"</strong> is successfully saved.");
+            showMessage("<strong>Saved!</strong> Your note <strong>\"" + truncateText(note.title, 30) + "\"</strong> is successfully saved.");
         });
     } else if ($.isNumeric(id)) {
         requestNote("getNote", "GET", id, function (note) {
@@ -122,7 +122,7 @@ function requestNote(request, method, id, onSuccess, note) {
         },
         success: onSuccess,
         error: function (output) {
-            console.log(output);
+            console.log(output.responseText);
         }
     });
 }

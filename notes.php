@@ -2,63 +2,24 @@
     require 'vendor/autoload.php';
     $baseURI = "http://docent.cmi.hro.nl/bootb/restdemo/notes/";
     $client = new GuzzleHttp\Client();
-
-    $http;
-    if (isset($_GET["request"])) 
+    if (isset($_REQUEST["request"]))
     {
-        $http = $_GET;
-    }
-    else if (isset($_POST["request"]))
-    {
-        $http = $_POST;
-    }
-
-    if (isset($http["request"]))
-    {
-        switch ($http["request"])
+        switch ($_REQUEST["request"])
         {
-            case "getNote":
-                getNote($client, $baseURI, (isset($http["id"]) && $http["id"] != "" ? $http["id"] : ""));
-                break;
-            case "createNote":
-                createNote($client, $baseURI, $http["note"]);
-                break;
             case "updateNote":
-                updateNote($client, $baseURI, $http["note"]);
+                note($client, $baseURI, $_REQUEST["note"]["id"], $_REQUEST["note"], "PUT");
                 break;
             case "deleteNote":
-                deleteNote($client, $baseURI, $http["id"]);
+                note($client, $baseURI, $_REQUEST["id"], [], "DELETE");
                 break;
             default:
-                getAllNotes($client, $baseURI);
+                note($client, $baseURI, (isset($_REQUEST["id"]) && $_REQUEST["id"] != "" ? $_REQUEST["id"] : ""), (isset($_REQUEST["note"]) && $_REQUEST["note"] != [] ? $_REQUEST["note"] : []), $_SERVER["REQUEST_METHOD"]);
                 break;
         }
     }
 
-    function getNote($client, $url, $id)
+    function note($client, $url, $id = "", $note = [], $method)
     {
-        $response = $client->get($url . $id);
-        echo $response->getBody();
+        $response = $client->request($method, $url . $id, ["json" => $note]);
+        echo ($response->getBody() == "" ? "{}" : $response->getBody());
     }
-     
-    function createNote($client, $url, $note)
-    {
-        $response = $client->post($url, ["json" => $note]);
-        echo $response->getBody();
-    }
-
-    function updateNote($client, $url, $note)
-    {
-        $response = $client->put($url . $note["id"], ["json" => $note]);
-        echo $response->getBody();
-    }
-
-    function deleteNote($client, $url, $id) 
-    {
-        $response = $client->delete($url . $id);
-        echo "{}";
-    }
-
-
-
-
