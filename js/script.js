@@ -88,7 +88,7 @@ function extendNote(note, request, onSuccess) {
         author: $("#input-author").val(),
         date: formatDate(new Date())
     });
-    requestNote(request, "POST", "", onSuccess, note);
+    requestNote(request, "POST", note.id, onSuccess, note);
 }
 
 function deleteNote(e) {

@@ -4,21 +4,20 @@
     $client = new GuzzleHttp\Client();
     if (isset($_REQUEST["request"]))
     {
+        $method = $_SERVER["REQUEST_METHOD"];
         switch ($_REQUEST["request"])
         {
             case "updateNote":
-                note($client, $baseURI, $_REQUEST["note"]["id"], $_REQUEST["note"], "PUT");
+                $method = "PUT";
                 break;
             case "deleteNote":
-                note($client, $baseURI, $_REQUEST["id"], [], "DELETE");
-                break;
-            default:
-                note($client, $baseURI, (isset($_REQUEST["id"]) && $_REQUEST["id"] != "" ? $_REQUEST["id"] : ""), (isset($_REQUEST["note"]) && $_REQUEST["note"] != [] ? $_REQUEST["note"] : []), $_SERVER["REQUEST_METHOD"]);
+                $method = "DELETE";
                 break;
         }
+        note($client, $baseURI, $method, (isset($_REQUEST["id"]) ? $_REQUEST["id"] : ""), (isset($_REQUEST["note"]) ? $_REQUEST["note"] : []));
     }
 
-    function note($client, $url, $id = "", $note = [], $method)
+    function note($client, $url, $method, $id = "", $note = [])
     {
         $response = $client->request($method, $url . $id, ["json" => $note]);
         echo ($response->getBody() == "" ? "{}" : $response->getBody());
