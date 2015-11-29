@@ -85,8 +85,7 @@ function extendNote(note, request, onSuccess) {
     note = $.extend(note, {
         title: $("#input-title").val(),
         body: $("#input-body").val(),
-        author: $("#input-author").val(),
-        date: formatDate(new Date())
+        author: $("#input-author").val()
     });
     requestNote(request, "POST", note.id, onSuccess, note);
 }
@@ -130,15 +129,6 @@ function requestNote(request, method, id, onSuccess, note) {
 function truncateText(t, l) {
     if (t.length < l) return t;
     return t.substring(0, l) + "...";
-}
-
-function formatDate(date) {
-    var month = date.getMonth() + 1;
-    var day = date.getDate();
-    var hours = date.getHours();
-    var minutes = date.getMinutes();
-    var seconds = date.getSeconds();
-    return date.getFullYear() + "-" + (month < 10?"0":"") + month + "-" + (day < 10?"0":"") + day + " " + (hours < 10?"0":"") + hours + ":" + (minutes < 10?"0":"") + minutes + ":" + (seconds < 10?"0":"") + seconds;
 }
 
 function showMessage(html) {
