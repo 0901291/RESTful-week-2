@@ -88,6 +88,10 @@
     font-size: inherit;
 }
 
+.hidden {
+    display: none;
+}
+
 
 
 

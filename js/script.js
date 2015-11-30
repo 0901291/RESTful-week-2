@@ -10,15 +10,16 @@ function initApp() {
     $(".container").on("click", "#save-note", initSaveNote);
     $(".container").on("click", "#cancel-note", closeNoteForm);
     requestNote("getNote", "GET", "", printNotes);
+    initInterval();
 }
 
-function printNotes(data) {
-    var notes = "<ul id='notes' class='panel list-group'>";
-    $.each(data, function(k, v) {
-        notes += formatNote(v);
+function printNotes(notes) {
+    var newNotes = "<ul id='notes' class='panel list-group'>";
+    $.each(notes, function(k, v) {
+        newNotes += formatNote(v);
     });
-    notes += "</ul>";
-    $(".container").append(notes);
+    newNotes += "</ul>";
+    $(".container").append(newNotes);
 }
 
 function formatNote(note) {
@@ -107,6 +108,25 @@ function getAuthor(e) {
     requestNote("getNote", "GET", id, function (note) {
         $("#note-" + id).find(".author").text("By " + (note.author.length > 0 ? note.author : "-") + " on " + note.date);
     });
+}
+
+function initInterval() {
+    setInterval(function () {
+        requestNote("getNote", "GET", "", checkNotes);
+    }, 1000);
+}
+
+function checkNotes(notes) {
+    var currentNotes = $("#notes").html();
+    var newNotes = "";
+    $.each(notes, function(k, v) {
+        newNotes += formatNote(v);
+    });
+    $("#temp-notes").html(newNotes);
+    newNotes = $("#temp-notes").html();
+    if (currentNotes != newNotes) {
+        $("#notes").html(newNotes);
+    }
 }
 
 function requestNote(request, method, id, onSuccess, note) {
