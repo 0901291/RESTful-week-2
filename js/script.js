@@ -20,6 +20,7 @@ function printNotes(notes) {
     });
     newNotes += "</ul>";
     $(".container").append(newNotes);
+    $("#temp-notes-1").text($("#notes").html());
 }
 
 function formatNote(note) {
@@ -117,15 +118,16 @@ function initInterval() {
 }
 
 function checkNotes(notes) {
-    var currentNotes = $("#notes").html();
+    var currentNotes = $("#temp-notes-1").text();
     var newNotes = "";
     $.each(notes, function(k, v) {
         newNotes += formatNote(v);
     });
-    $("#temp-notes").html(newNotes);
-    newNotes = $("#temp-notes").html();
+    $("#temp-notes-2").text(newNotes);
+    newNotes = $("#temp-notes-2").text();
     if (currentNotes != newNotes) {
         $("#notes").html(newNotes);
+        $("#temp-notes-1").text(newNotes);
     }
 }
 
