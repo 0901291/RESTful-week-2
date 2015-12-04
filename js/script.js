@@ -5,8 +5,8 @@ function initApp() {
         getDetails($(e.currentTarget).data("id"));
     });
     $(".container").on("click", "#notes .edit-button", initEditNote);
-    $(".container").on("click", "#notes .delete-button", deleteNote);
-    $(".container").on("click", "#notes .undelete-button", undeleteNote);
+    $(".container").on("click", "#notes .delete-button", changeNoteState);
+    $(".container").on("click", "#notes .undelete-button", changeNoteState);
     $(".container").on("click", "#note-form .panel-heading", function() {
         $("#note-form .panel-body").toggleClass("closed");
     });
@@ -96,28 +96,17 @@ function extendNote(note, request, onSuccess) {
     requestNote(request, "POST", "", note.id, onSuccess, {json: note});
 }
 
-function deleteNote(e) {
+function changeNoteState(e) {
     var id = $(e.currentTarget).parent().parent().attr("id");
     id = id.substring(5, id.length);
-    requestNote("deleteNote", "POST", "", id, function (output) {
+    var deleting = !$("#undelete").prop("checked");
+    requestNote((!deleting?"un":"") + "deleteNote", "POST", "", id, function (output) {
         $(".note[data-id=" + id + "]").remove();
         var title = $("#note-" + id).find("h3").text();
         $("#note-" + id).remove();
         $("body").animate({ scrollTop: 0 });
-        showMessage("<strong>Deleted!</strong> Your note <strong>\"" + truncateText(title, 30) + "\"</strong> is successfully deleted.");
-    });
-}
-
-function undeleteNote(e) {
-    var id = $(e.currentTarget).parent().parent().attr("id");
-    id = id.substring(5, id.length);
-    requestNote("undeleteNote", "POST", "", id, function (output) {
-        $(".note[data-id=" + id + "]").remove();
-        var title = $("#note-" + id).find("h3").text();
-        $("#note-" + id).remove();
-        $("body").animate({ scrollTop: 0 });
-        showMessage("<strong>Undeleted!</strong> Your note <strong>\"" + truncateText(title, 30) + "\"</strong> is successfully Undeleted.");
-    }, {form_params: {method: "undelete"}});
+        showMessage("<strong>" + (deleting?"Deleted":"Undeleted") + "!</strong> Your note <strong>\"" + truncateText(title, 30) + "\"</strong> is successfully " + (!deleting?"un":"") + "deleted.");
+    }, (deleting?{}:{form_params: {method: "undelete"}}));
 }
 
 function getDetails(id) {
@@ -147,7 +136,7 @@ function checkNotes(notes) {
         if ($.isNumeric(openedNoteId)) {
             $("#notes .note[data-id=" + openedNoteId + "]").removeClass("collapsed");
             $("#note-" + openedNoteId).addClass("in");
-            getDetails(openedNoteId);
+            if ($("#notes").hasClass("delete")) getDetails(openedNoteId);
         }
     }
 }
