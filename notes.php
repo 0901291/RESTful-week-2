@@ -14,11 +14,11 @@
                 $method = "DELETE";
                 break;
         }
-        note($client, $baseURI, $method, (isset($_REQUEST["id"]) ? $_REQUEST["id"] : ""), (isset($_REQUEST["note"]) ? $_REQUEST["note"] : []));
+        note($client, $baseURI, $method, (isset($_REQUEST["extra"]) ? $_REQUEST["extra"] : ""), (isset($_REQUEST["id"]) ? $_REQUEST["id"] : ""), (isset($_REQUEST["note"]) ? $_REQUEST["note"] : []));
     }
 
-    function note($client, $url, $method, $id = "", $note = [])
+    function note($client, $url, $method, $extra, $id, $note)
     {
-        $response = $client->request($method, $url . $id, ["json" => $note]);
+        $response = $client->request($method, $url.$id.$extra, $note);
         echo ($response->getBody() == "" ? "{}" : $response->getBody());
     }
