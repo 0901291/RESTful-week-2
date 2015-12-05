@@ -13,7 +13,7 @@ function initApp() {
     $(".container").on("click", "#save-note", initSaveNote);
     $(".container").on("click", "#cancel-note", closeNoteForm);
     $(".container").on("change", "#undelete", checkUndelete);
-    requestNote("getNote", "GET", "?deleted=" + $("#undelete").prop("checked"), "", printNotes);
+    requestNote("getNote", "GET", printNotes, {query: {deleted: $("#undelete").prop("checked")}});
     initInterval();
 }
 
@@ -45,7 +45,7 @@ function formatNote(note) {
 function initEditNote(e) {
     $("#note-form .panel-heading").text("Edit note");
     var id = $(e.currentTarget).parent().parent().attr("id");
-    requestNote("getNote", "GET", "", id.substring(5, id.length), fillNoteForm);
+    requestNote("getNote", "GET", fillNoteForm, {query: {id: id.substring(5, id.length)}});
 }
 
 function fillNoteForm(note) {
@@ -75,7 +75,7 @@ function initSaveNote() {
             showMessage("<strong>Saved!</strong> Your note <strong>\"" + truncateText(note.title, 30) + "\"</strong> is successfully saved.");
         });
     } else if ($.isNumeric(id)) {
-        requestNote("getNote", "GET", "", id, function (note) {
+        requestNote("getNote", "GET", function (note) {
             extendNote(note, "updateNote", function (note) {
                 $("#notes .note[data-id=" + note.id + "]").remove();
                 $("#notes #note-" + note.id).addClass("to-remove").after(formatNote(note));
@@ -83,7 +83,7 @@ function initSaveNote() {
                 closeNoteForm();
                 showMessage("<strong>Saved!</strong> Your note <strong>\"" + truncateText(note.title, 30) + "\"</strong> is successfully saved.");
             });
-        });
+        }, {query: {id: id}});
     }
 }
 
@@ -93,31 +93,31 @@ function extendNote(note, request, onSuccess) {
         body: $("#input-body").val(),
         author: $("#input-author").val()
     });
-    requestNote(request, "POST", "", note.id, onSuccess, {json: note});
+    requestNote(request, "POST", onSuccess, {json: note, query: {id: note.id}});
 }
 
 function changeNoteState(e) {
     var id = $(e.currentTarget).parent().parent().attr("id");
     id = id.substring(5, id.length);
     var deleting = !$("#undelete").prop("checked");
-    requestNote((!deleting?"un":"") + "deleteNote", "POST", "", id, function (output) {
+    requestNote((deleting?"deleteNote":"undeleteNote"), "POST", function (output) {
         $(".note[data-id=" + id + "]").remove();
         var title = $("#note-" + id).find("h3").text();
         $("#note-" + id).remove();
         $("body").animate({ scrollTop: 0 });
         showMessage("<strong>" + (deleting?"Deleted":"Undeleted") + "!</strong> Your note <strong>\"" + truncateText(title, 30) + "\"</strong> is successfully " + (!deleting?"un":"") + "deleted.");
-    }, (deleting?{}:{form_params: {method: "undelete"}}));
+    }, (deleting?{query: {id: id}}:{form_params: {method: "undelete"}, query: {id: id}}));
 }
 
 function getDetails(id) {
-    requestNote("getNote", "GET", "", id, function (note) {
+    requestNote("getNote", "GET", function (note) {
         $("#note-" + id).find(".author").text("By " + (note.author.length > 0 ? note.author : "-") + " on " + note.date);
-    });
+    }, {query: {id: id}});
 }
 
 function initInterval() {
     setInterval(function () {
-        requestNote("getNote", "GET", "?deleted=" + $("#undelete").prop("checked"), "", checkNotes);
+        requestNote("getNote", "GET", checkNotes, {query: {deleted: $("#undelete").prop("checked")}});
     }, 1000);
 }
 
@@ -144,19 +144,17 @@ function checkNotes(notes) {
 function checkUndelete() {
     $("#notes.undelete").remove();
     $("#notes.delete").remove();
-    requestNote("getNote", "GET", "?deleted=" + $("#undelete").prop("checked"), "", printNotes);
+    requestNote("getNote", "GET", printNotes, {query: {deleted: $("#undelete").prop("checked")}});
 }
 
-function requestNote(request, method, extra, id, onSuccess, note) {
+function requestNote(request, method, onSuccess, options) {
     $.ajax({
         method: method,
         url: "notes.php",
         dataType: "JSON",
         data: {
             request: request,
-            id: id,
-            note: note,
-            extra: extra
+            options: options
         },
         success: onSuccess,
         error: function (output) {
